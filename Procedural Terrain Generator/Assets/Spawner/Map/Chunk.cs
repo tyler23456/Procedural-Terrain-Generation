@@ -4,13 +4,12 @@ using System.Threading.Tasks;
 
 using Spawner2.UserAssets;
 using Spawner2.UserGenerator;
-using Spawner2.UserSnap;
 
 namespace Spawner2.UserMap
 {
 	class Chunk
 	{
-		public const int layer = 6;
+		public const int layer = 0;
 		public const float seaLevel = 30f;
 		GameObject waterObject;
 
@@ -31,18 +30,16 @@ namespace Spawner2.UserMap
 
 		Assets assets;
 		Generator generator;
-		Snap snap;
 
 		public bool isInstantiated
         {
 			get { return terrainObject != null; }
         }
 
-        public Chunk(Assets assets, Generator generator, Snap snap)
+        public Chunk(Assets assets, Generator generator)
         {
 			this.assets = assets;
 			this.generator = generator;
-			this.snap = snap;
 		}
 
         public async void LoadAsync(int indexX, int indexY)
@@ -84,16 +81,6 @@ namespace Spawner2.UserMap
 			}
 			data.SetTreeInstances(trees.ToArray(), true);
 			#endregion
-
-			//#region Spawn Enemies
-			//GameObject[] enemyObjs = assets.GetGameObject(Resources.LoadAll("Enemies", typeof(GameObject)));
-			//while (enemies.Count > 0)
-			//{
-				//GameObject obj = GameObject.Instantiate(enemyObjs[enemies[0].index], enemies[0].position + new Vector3(0, 600, 0), Quaternion.identity);
-				//enemies.RemoveAt(0);
-				//snap.Add(obj.GetComponent<CharacterController>());
-			//}
-            //#endregion
 
             #region Instantiate Terrain Gameobject
             terrainObject = Terrain.CreateTerrainGameObject(data);

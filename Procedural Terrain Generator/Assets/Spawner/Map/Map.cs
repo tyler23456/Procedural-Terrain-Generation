@@ -7,11 +7,10 @@ using System.Threading;
 
 using Spawner2.UserAssets;
 using Spawner2.UserGenerator;
-using Spawner2.UserSnap;
 
 namespace Spawner2.UserMap
 {
-    [RequireComponent(typeof(Assets), typeof(Generator), typeof(Snap))]
+    [RequireComponent(typeof(Assets), typeof(Generator))]
     class Map : MonoBehaviour
     {
         [SerializeField]
@@ -27,11 +26,6 @@ namespace Spawner2.UserMap
         List<(int, int)> keys = new List<(int, int)> { };
         List<(int, int)> keysToRemove = new List<(int, int)> { };
 
-        public void Awake()
-        {
-            GetComponent<Snap>().Add(subject.GetComponent<CharacterController>());
-        }
-
         public void Update()
         {
             Vector3 position = subject.position;
@@ -46,7 +40,7 @@ namespace Spawner2.UserMap
                     if (!chunks.ContainsKey((x, y)) && isWithinPlayerRange((x, y), position, 0f))
                     {
                         keys.Add((x, y));
-                        chunks.Add((x, y), new Chunk(GetComponent<Assets>(), GetComponent<Generator>(), GetComponent<Snap>()));
+                        chunks.Add((x, y), new Chunk(GetComponent<Assets>(), GetComponent<Generator>()));
                         chunks[(x, y)].LoadAsync(x, y);
                     }
                 }

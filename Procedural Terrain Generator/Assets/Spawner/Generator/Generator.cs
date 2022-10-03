@@ -14,19 +14,34 @@ namespace Spawner2.UserGenerator
         AnimationCurve smoother = new AnimationCurve(new Keyframe(-0.2f, 3f), new Keyframe(1.2f, 0.8f));
         AnimationCurve lacunarity = new AnimationCurve(new Keyframe(-0.2f, 2f), new Keyframe(1.2f, 2f));
         AnimationCurve persistance = new AnimationCurve(new Keyframe(-0.2f, 0.45f), new Keyframe(1.2f, 0.55f));
-        AnimationCurve amplitude = new AnimationCurve(new Keyframe(-0.2f, 0.2f), new Keyframe(1.2f, 0.6f));
+        AnimationCurve amplitude = new AnimationCurve(new Keyframe(-0.2f, 0.2f), new Keyframe(1.2f, 0.8f));
         AnimationCurve eAmplitude = new AnimationCurve(new Keyframe(-0.2f, 0.2f), new Keyframe(1.2f, 0.8f)); //------
         AnimationCurve frequency = new AnimationCurve(new Keyframe(-0.2f, 0.6f), new Keyframe(1.2f, 0.602f));
 
-        Variation[] layerVariations = new Variation[3] { new Variation(0, 5, 1, 1f, 0f, 10f),
+        int layerCount;
+        int detailCount;
+        int treeCount;
+        Variation[] layerVariations;
+        Variation[] detailVariations;
+        Variation[] treeVariations;
+
+        void Start()
+        {
+            layerCount = Resources.LoadAll("Map/Layers", typeof(TerrainLayer)).Length;
+            detailCount = Resources.LoadAll("Map/Grasses", typeof(Sprite)).Length;
+            treeCount = Resources.LoadAll("Map/Trees", typeof(GameObject)).Length;
+
+
+            //you can edit this to specify how objects such as grass, trees and textures spawn on the terrain.
+            layerVariations = new Variation[3] { new Variation(0, 5, 1, 1f, 0f, 10f),
                                                          new Variation(5, 1, 1, 1f, 10f, 26f),
                                                          new Variation(6, 6, 3, 1f, 36f, 18f) };
 
-        Variation[] detailVariations = new Variation[1] { new Variation(11, 8, 8, 1f, 10f, 2f) };
+            detailVariations = new Variation[1] { new Variation(11, 8, 8, 1f, 10f, 2f) };
 
-        Variation[] treeVariations = new Variation[1] { new Variation(0, 4, 4, 0.01f, 20f, 3f) }; //0.0005
-
-        Variation[] enemyVariations = new Variation[1] { new Variation(0, 8, 3, 0.00005f, 0f, 10f) };
+            treeVariations = new Variation[1] { new Variation(0, 5, 4, 0.004f, 23f, 3f) };
+            //end edit---------------------------------------------------------------------------------------
+        }
 
         public void Generate(float worldX, float worldY, float[,] heightmap, float[,,] alphamap, int[][,] detailLayer, List<TreeInstance> instances, List<(int index, Vector3 position)> enemies, Vector3 chunkSize)
         {
@@ -128,7 +143,7 @@ namespace Spawner2.UserGenerator
                         foreach (Variation layer in layerVariations)
                         {
                             bioIndex = layer.GetPrototypeIndex(slope, lElevation);
-                            if (bioIndex > -1)
+                            if (bioIndex > -1 && bioIndex < layerCount)
                             {
                                 alphamap[bioY, bioX, bioIndex] = 1f;
                                 break;
@@ -146,7 +161,7 @@ namespace Spawner2.UserGenerator
                             foreach (Variation detail in detailVariations)
                             {
                                 bioIndex = detail.GetPrototypeIndex(slope, lElevation);
-                                if (bioIndex > -1)
+                                if (bioIndex > -1 && bioIndex < detailCount)
                                 {
                                     detailLayer[bioIndex][bioY, bioX] = 14;
                                     break;
@@ -160,7 +175,7 @@ namespace Spawner2.UserGenerator
                             foreach (Variation tree in treeVariations)
                             {
                                 bioIndex = tree.GetPrototypeIndex(slope, lElevation);
-                                if (bioIndex > -1)
+                                if (bioIndex > -1 && bioIndex < treeCount)
                                 {
                                     instance.prototypeIndex = bioIndex;
                                     instance.position = new Vector3((float)x / Chunk.faceLength, 0f, (float)y / Chunk.faceLength);
@@ -171,23 +186,6 @@ namespace Spawner2.UserGenerator
                             #endregion
                         }
                         //end calculate foilage
-
-
-                        //Begin Calculate Enemies
-                        #region Calculate Enemies that will spawn on this chunk
-                        //decides where to place trees
-                        bioIndex = -1;
-                        foreach (Variation enemyVariation in enemyVariations)
-                        {
-                            bioIndex = enemyVariation.GetPrototypeIndex(slope, lElevation);
-                            if (bioIndex > -1)
-                            {
-                                //enemies.Add((bioIndex, new Vector3(worldX + x, 0, worldY + y)));
-                                break;
-                            }
-                        }
-                        #endregion
-                        //End Calculate Enemies
                     }
                 }
            
